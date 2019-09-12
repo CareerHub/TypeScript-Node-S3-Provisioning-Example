@@ -1,6 +1,8 @@
 import { S3, AWSError } from 'aws-sdk';
 import { PutObjectOutput } from 'aws-sdk/clients/s3';
 import { readFile } from 'fs';
+import { promisify } from 'util';
+const readFileAsync = promisify(readFile);
 
 const config = {
     accessKeyId: '[YOUR ACCESS ID]',
@@ -17,20 +19,28 @@ const client = new S3({
     region: config.region
 });
 
-readFile(config.filePath, (err, data) => {
-    if (err) {
-        console.error(err);
-        return;
+const handleError = (error: Error) => {
+    console.error(error);
+    process.exit();
+};
+
+const main = async() => {
+    try {
+        const data = await readFileAsync(config.filePath);
+        client.putObject({
+            Key: config.fileKey,
+            Bucket: config.bucketName,
+            Body: data
+        }, (s3Error: AWSError, response: PutObjectOutput) => {
+            if (s3Error) {
+                throw s3Error;
+            }
+            console.log(response);
+        });
+    } catch (err) {
+        handleError(err);
     }
-    client.putObject({
-        Key: config.fileKey,
-        Bucket: config.bucketName,
-        Body: data
-    }, (s3Error: AWSError, response: PutObjectOutput) => {
-        if (s3Error) {
-            console.error(s3Error);
-        }
-        console.log(response);
-    });
-});
+};
+
+main().catch(handleError);
 

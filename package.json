@@ -9,10 +9,10 @@
   "author": "CareerHub Pty. Ltd.",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.271.1",
-    "typescript": "^2.9.2"
+    "aws-sdk": "^2.527.0",
+    "typescript": "^3.6.3"
   },
   "devDependencies": {
-    "@types/node": "^10.5.2"
+    "@types/node": "^12.7.5"
   }
 }
